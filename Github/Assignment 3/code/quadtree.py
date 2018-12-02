@@ -22,15 +22,15 @@ class QuadTree:
 	Generation of the QuadTree is slow, using it to reduce your dataset it fast.
 
 	"""
-	def __init__(self,bbox, depth):
+	def __init__(self, bbox, depth):
 		"""
 		Create a new QuadTree instance.
 		:param bbox: the initial BoundingBox
 		:param depth: the depth of the QuadTree
 
 		:Example:
-		>>> bbox = bb.BoundingBox(2,9,1,7)
-		>>> qt = QuadTree(bbox, 2)
+		# >>> bbox = bb.BoundingBox(2,9,1,7)
+		# >>> qt = QuadTree(bbox, 2)
 		"""
 		self.quads = {}
 		self.depth = depth
@@ -40,6 +40,7 @@ class QuadTree:
 
 		self.quads[0] = [bbox]
 		self.recurse(bbox, 1)
+
 
 	def recurse(self, bbox, depth):
 		"""
@@ -51,35 +52,51 @@ class QuadTree:
 
 		:To be implemented by the student:		
 		"""
+		current_level = 1
+		while current_level <= depth:
+			bbWidth = bbox.width()
+			bbHeight = bbox.height()
+			lowerleft = bbox.lower_left()
 
-		current_level = 1;
-		while (current_level <= 1):
-			for k, v in self.quads.items():
-				print(k, len(v))
-				for x in v:
+			bottom_left = bb.BoundingBox(lowerleft[0], lowerleft[0] + bbWidth / 2, lowerleft[1],
+										 lowerleft[1] + bbHeight / 2)
+			bottom_right = bb.BoundingBox(lowerleft[0] + bbWidth / 2, lowerleft[0] + bbWidth, lowerleft[1],
+										  lowerleft[1] + bbHeight / 2)
+			top_left = bb.BoundingBox(lowerleft[0], lowerleft[0] + bbWidth / 2, lowerleft[1] + bbHeight / 2,
+									  lowerleft[1] + bbHeight)
+			top_right = bb.BoundingBox(lowerleft[0] + bbWidth / 2, lowerleft[0] + bbWidth, lowerleft[1] + bbHeight / 2,
+									   lowerleft[1] + bbHeight)
 
-					# currLevelBB = bb.BoundingBox.from_dataset(np.transpose(x.data), xindex= 0, yindex= 1)
-					currLevelBB = bb.BoundingBox.from_matrix(x.data)
-					print(currLevelBB)
-					bbWidth = currLevelBB.width()
-					bbHeight = currLevelBB.height()
-					lowerleft = currLevelBB.lower_left()
+			self.quads.update(current_level = [bottom_left, bottom_right, top_left, top_right])
 
-					bottom_left = bb.BoundingBox(lowerleft[0], lowerleft[0] + bbWidth / 2, lowerleft[1], lowerleft[1] + bbHeight / 2)
-					bottom_right = bb.BoundingBox(lowerleft[0] + bbWidth / 2, lowerleft[0] + bbWidth, lowerleft[1], lowerleft[1] + bbHeight / 2)
-					top_left = bb.BoundingBox(lowerleft[0], lowerleft[0] + bbWidth / 2, lowerleft[1] + bbHeight/2, lowerleft[1] + bbHeight)
-					top_right = bb.BoundingBox(lowerleft[0] + bbWidth / 2, lowerleft[0] + bbWidth, lowerleft[1] + bbHeight/2, lowerleft[1] + bbHeight)
-
-					self.quads[current_level] = [bottom_left, bottom_right, top_left, top_right]
-
-					print(current_level)
+		# self.quads[current_level] = [arrayofQuads]
 			current_level += 1
 
-		# print(self.quadrants())
-		for k,v in self.quads.items():
-			print (k,len(v))
-			for x in v:
-				print(x.data)
+
+		# current_level = 1
+		#
+		# while current_level <= depth:
+		# 	for k, v in self.quads.items():
+		# 		print(k, len(v))
+		# 		for x in v:
+		# 			print(x)
+		# 			# currLevelBB = bb.BoundingBox.from_dataset(np.transpose(x.data), xindex= 0, yindex= 1)
+		# 			currLevelBB = bb.BoundingBox.from_matrix(x.data)
+		# 			#print(currLevelBB)
+		# 			bbWidth = currLevelBB.width()
+		# 			bbHeight = currLevelBB.height()
+		# 			lowerleft = currLevelBB.lower_left()
+		#
+		# 			bottom_left = bb.BoundingBox(lowerleft[0], lowerleft[0] + bbWidth / 2, lowerleft[1], lowerleft[1] + bbHeight / 2)
+		# 			bottom_right = bb.BoundingBox(lowerleft[0] + bbWidth / 2, lowerleft[0] + bbWidth, lowerleft[1], lowerleft[1] + bbHeight / 2)
+		# 			top_left = bb.BoundingBox(lowerleft[0], lowerleft[0] + bbWidth / 2, lowerleft[1] + bbHeight/2, lowerleft[1] + bbHeight)
+		# 			top_right = bb.BoundingBox(lowerleft[0] + bbWidth / 2, lowerleft[0] + bbWidth, lowerleft[1] + bbHeight/2, lowerleft[1] + bbHeight)
+		#
+		# 			# print(top_left)
+		# 			# print(top_right)
+		# 			#self.quads[current_level].append([bottom_left, bottom_right, top_left, top_right])
+		#
+		# 	current_level += 1
 
 
 	@staticmethod	
@@ -136,13 +153,21 @@ class QuadTree:
 if __name__ == '__main__':
 
 	bbox = bb.BoundingBox(2,9,1,7)
-	# print(QuadTree.at_least(900))
-	# print(QuadTree.at_most(900))
-	# print(QuadTree.level(1))
-	# print(QuadTree.level(5))
-	# print(QuadTree.level(900))
-
+	# # print(QuadTree.at_least(900))
+	# # print(QuadTree.at_most(900))
+	# # print(QuadTree.level(1))
+	# # print(QuadTree.level(5))
+	# # print(QuadTree.level(900))
+	#
 	qt = QuadTree(bbox, 2)
+	for k, v in qt.quads.items():
+		print(k, len(v))
+		for x in v:
+			print(x.data)
+	# for k,v in qt.quads.items():
+	# 	print (k,len(v))
+	# 	for x in v:
+	# 		print(x.data)
 	# for k,v in qt.quads.items():
 	# 	print (k,len(v))
 	# 	for x in v:
