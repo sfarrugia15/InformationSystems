@@ -1,4 +1,5 @@
 import boundingbox as bb
+import database as db
 import math
 import numpy as np
 class QuadTree:
@@ -39,7 +40,7 @@ class QuadTree:
 			self.quads[x]= []
 
 		self.quads[0] = [bbox]
-		self.recurse(bbox, 1)
+		self.recurse(bbox, depth)
 
 
 	def recurse(self, bbox, depth):
@@ -52,52 +53,55 @@ class QuadTree:
 
 		:To be implemented by the student:		
 		"""
+		root_node = bbox;
 		current_level = 1
-		while current_level <= depth:
-			bbWidth = bbox.width()
-			bbHeight = bbox.height()
-			lowerleft = bbox.lower_left()
+		while current_level < depth:
+			if current_level == 1:
+				bbWidth = root_node.width()
+				bbHeight = root_node.height()
+				lowerleft = root_node.lower_left()
 
-			bottom_left = bb.BoundingBox(lowerleft[0], lowerleft[0] + bbWidth / 2, lowerleft[1],
-										 lowerleft[1] + bbHeight / 2)
-			bottom_right = bb.BoundingBox(lowerleft[0] + bbWidth / 2, lowerleft[0] + bbWidth, lowerleft[1],
-										  lowerleft[1] + bbHeight / 2)
-			top_left = bb.BoundingBox(lowerleft[0], lowerleft[0] + bbWidth / 2, lowerleft[1] + bbHeight / 2,
-									  lowerleft[1] + bbHeight)
-			top_right = bb.BoundingBox(lowerleft[0] + bbWidth / 2, lowerleft[0] + bbWidth, lowerleft[1] + bbHeight / 2,
-									   lowerleft[1] + bbHeight)
+				bottom_left = bb.BoundingBox(lowerleft[0], lowerleft[0] + bbWidth / 2, lowerleft[1],
+											 lowerleft[1] + bbHeight / 2)
 
-			self.quads.update(current_level = [bottom_left, bottom_right, top_left, top_right])
+				bottom_right = bb.BoundingBox(lowerleft[0] + bbWidth / 2, lowerleft[0] + bbWidth, lowerleft[1],
+											  lowerleft[1] + bbHeight / 2)
 
-		# self.quads[current_level] = [arrayofQuads]
-			current_level += 1
+				top_left = bb.BoundingBox(lowerleft[0], lowerleft[0] + bbWidth / 2, lowerleft[1] + bbHeight / 2,
+										  lowerleft[1] + bbHeight)
 
+				top_right = bb.BoundingBox(lowerleft[0] + bbWidth / 2, lowerleft[0] + bbWidth, lowerleft[1] + bbHeight / 2,
+										   lowerleft[1] + bbHeight)
 
-		# current_level = 1
-		#
-		# while current_level <= depth:
-		# 	for k, v in self.quads.items():
-		# 		print(k, len(v))
-		# 		for x in v:
-		# 			print(x)
-		# 			# currLevelBB = bb.BoundingBox.from_dataset(np.transpose(x.data), xindex= 0, yindex= 1)
-		# 			currLevelBB = bb.BoundingBox.from_matrix(x.data)
-		# 			#print(currLevelBB)
-		# 			bbWidth = currLevelBB.width()
-		# 			bbHeight = currLevelBB.height()
-		# 			lowerleft = currLevelBB.lower_left()
-		#
-		# 			bottom_left = bb.BoundingBox(lowerleft[0], lowerleft[0] + bbWidth / 2, lowerleft[1], lowerleft[1] + bbHeight / 2)
-		# 			bottom_right = bb.BoundingBox(lowerleft[0] + bbWidth / 2, lowerleft[0] + bbWidth, lowerleft[1], lowerleft[1] + bbHeight / 2)
-		# 			top_left = bb.BoundingBox(lowerleft[0], lowerleft[0] + bbWidth / 2, lowerleft[1] + bbHeight/2, lowerleft[1] + bbHeight)
-		# 			top_right = bb.BoundingBox(lowerleft[0] + bbWidth / 2, lowerleft[0] + bbWidth, lowerleft[1] + bbHeight/2, lowerleft[1] + bbHeight)
-		#
-		# 			# print(top_left)
-		# 			# print(top_right)
-		# 			#self.quads[current_level].append([bottom_left, bottom_right, top_left, top_right])
-		#
-		# 	current_level += 1
+				self.quads[current_level] = [bottom_left, bottom_right, top_left, top_right]
+				current_level = current_level + 1
+				print('current level', current_level)
+			else:
+				print("HELLO")
+				self.quads[current_level] = []
+				for quad in range(len(self.quads[current_level-1])):
+					parentQuad = self.quads[current_level-1][quad]
+					bbWidth = parentQuad.width()
+					bbHeight = parentQuad.height()
+					lowerleft = parentQuad.lower_left()
 
+					bottom_left = bb.BoundingBox(lowerleft[0], lowerleft[0] + bbWidth / 2, lowerleft[1],
+												 lowerleft[1] + bbHeight / 2)
+
+					bottom_right = bb.BoundingBox(lowerleft[0] + bbWidth / 2, lowerleft[0] + bbWidth,
+												  lowerleft[1],
+												  lowerleft[1] + bbHeight / 2)
+
+					top_left = bb.BoundingBox(lowerleft[0], lowerleft[0] + bbWidth / 2,
+											  lowerleft[1] + bbHeight / 2,
+											  lowerleft[1] + bbHeight)
+
+					top_right = bb.BoundingBox(lowerleft[0] + bbWidth / 2, lowerleft[0] + bbWidth,
+											   lowerleft[1] + bbHeight / 2,
+											   lowerleft[1] + bbHeight)
+
+					self.quads[current_level].extend([bottom_left, bottom_right, top_left, top_right])
+				current_level = current_level + 1;
 
 	@staticmethod	
 	def at_least(size):
@@ -159,17 +163,10 @@ if __name__ == '__main__':
 	# # print(QuadTree.level(5))
 	# # print(QuadTree.level(900))
 	#
-	qt = QuadTree(bbox, 2)
+	qt = QuadTree(bbox, 3)
 	for k, v in qt.quads.items():
 		print(k, len(v))
 		for x in v:
 			print(x.data)
-	# for k,v in qt.quads.items():
-	# 	print (k,len(v))
-	# 	for x in v:
-	# 		print(x.data)
-	# for k,v in qt.quads.items():
-	# 	print (k,len(v))
-	# 	for x in v:
-	# 		print(x.data)
+
 
